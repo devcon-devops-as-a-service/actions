@@ -1,0 +1,71 @@
+# This is a basic workflow to help you get started with Actions
+
+name: main workflow
+
+# Controls when the workflow will run
+on:
+  workflow_call:
+    inputs:
+      stack:
+        required: true
+        type: string
+      securityscan:
+        required: true
+        type: boolean
+      
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  preperation:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4.2.2
+
+    - name: Azure Login
+      uses: Azure/login@v2.2.0
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Prepare services for build
+        id: prepareforbuild
+        uses:  
+        with:
+          shouldBump: false
+          changedServices: ${{ steps.changedProjects.outputs.changedServices }}
+          imagePrefix: ${{ inputs.ecr_images_prefix }}
+
+  build-test-push:
+    needs: buildUpdatedServices
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.buildUpdatedServices.outputs.services) }}
+    steps:
+      - name: test 
+        run: |
+            test
+       
+      - name: build
+        run: |
+          docker build
+          az acr login --name myContainerRegistry
+  
+      - name: push
+        run: docker push
+    
+      - name: Run Microsoft Security DevOps
+        uses: microsoft/security-devops-action@latest
+        id: msdo
+        with:
+          tools: trivy 
+        
+
+  argoupdate:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
