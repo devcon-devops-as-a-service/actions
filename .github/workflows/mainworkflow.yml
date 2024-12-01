@@ -40,6 +40,13 @@ jobs:
           changedServices: ${{ steps.changedProjects.outputs.changedServices }}
           imagePrefix: ${{ inputs.ecr_images_prefix }}
 
+    - name: argocd cli installation
+      run: |
+        VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
+        curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v$VERSION/argocd-linux-amd64
+        sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+        rm argocd-linux-amd64
+
   build-test-push:
     needs: buildUpdatedServices
     runs-on: ubuntu-latest
@@ -69,3 +76,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
+        argocd app create ${{ inputs.appname }} --repo ${{ inputs.repourl }}  --path  --dest-server https://kubernetes.default.svc --dest-namespace ${{}}
+
