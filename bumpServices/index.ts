@@ -1,41 +1,57 @@
-// import { error, getInput } from '@actions/core';
-import { inc } from 'semver';
+import { error, getInput, setOutput } from '@actions/core';
+import { inc, ReleaseType } from 'semver';
+import { context } from '@actions/github';
 import { execAsync } from './execAsync';
 
+const bumps: Record<string, ReleaseType> = {
+    fix: 'patch',
+    feat: 'minor',
+    breaking: 'major'
+};
+
+const getBumpFactor = (): ReleaseType => {
+    const commitMessage = context.payload.head_commit?.message as string;
+
+    if (!commitMessage?.length) {
+        // Running on a PR or any other weird use-case
+        return 'minor';
+    }
+
+    const prefix = commitMessage.split(':', 2)[0].trim().toLowerCase();
+
+    return bumps[prefix] || 'minor';
+};
+
 const main = async () => {
-    // const inputProjectsText = ['backend', 'frontend'];
-    // getInput('projects');
+    const inputProjectsText = getInput('projects');
 
-    // if (!inputProjectsText?.length) {
-    //      error('Cannot find input "inputProjects"');
+    if (!inputProjectsText?.length) {
+        error('Cannot find input "inputProjects"');
 
-    //     return;
-    // }
+        return;
+    }
 
-    const inputProjects = ['backend', 'frontend']; // JSON.parse(inputProjectsText) as string[];
+    const inputProjects = JSON.parse(inputProjectsText) as string[];
 
-    const currentVersions = await Promise.all(
+    const bumpFactor = getBumpFactor();
+
+    const serviceToBuild = await Promise.all(
         inputProjects.map(async project => {
             const tags = await execAsync(`git tag -l --sort=-creatordate "${project}@*"`);
 
-            const currentTag = tags.length ? tags[0] : null;
+            const currentTag = tags.length ? tags.split('\n', 2)[0].substring(project.length + 1) : null;
+
+            const nextVersion = currentTag ? inc(currentTag, bumpFactor) : '1.0.0';
 
             return {
                 project,
-                currentVersion: currentTag
+                currentVersion: currentTag,
+                nextVersion
             };
         })
     );
 
-    console.log('curr', currentVersions);
+    setOutput('serviceToBuild', { include: serviceToBuild });
 };
-
-// export const try1 = () => {
-//     console.log('Major', inc('1.0.0', 'major'));
-//     console.log('Minor', inc('1.0.0', 'minor'));
-//     console.log('Patch', inc('1.0.0', 'patch'));
-// };
-
-// try1();
 
 main();
