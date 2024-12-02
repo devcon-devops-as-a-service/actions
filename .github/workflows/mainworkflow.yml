@@ -12,69 +12,70 @@ on:
       securityscan:
         required: true
         type: boolean
-      
+
 permissions:
   id-token: write # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+  contents: read # This is required for actions/checkout
 
 jobs:
   preperation:
     runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.bumpServices.outputs.servicesToBuild }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
 
-    - name: Checkout
-      uses: actions/checkout@v4.2.2
-
-    - name: Azure Login
-      uses: Azure/login@v2.2.0
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-    - name: Prepare services for build
-        id: prepareforbuild
-        uses:  
+      - name: Bump Services
+        id: bumpServices
+        uses: ../bumpServices
         with:
-          shouldBump: false
-          changedServices: ${{ steps.changedProjects.outputs.changedServices }}
-          imagePrefix: ${{ inputs.ecr_images_prefix }}
-
-    - name: argocd cli installation
-      run: |
-        VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
-        curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v$VERSION/argocd-linux-amd64
-        sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
-        rm argocd-linux-amd64
+          stack: ${{ inputs.stack }}
 
   build-test-push:
-    needs: buildUpdatedServices
+    needs: preperation
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.buildUpdatedServices.outputs.services) }}
+      matrix: ${{ fromJson(needs.preperation.outputs.services ) }}
     steps:
-      - name: test 
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Azure Login
+        uses: Azure/login@v2.2.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: test
         run: |
-            test
-       
+          test
+
       - name: build
         run: |
           docker build
           az acr login --name myContainerRegistry
-  
+
       - name: push
         run: docker push
-    
+
       - name: Run Microsoft Security DevOps
         uses: microsoft/security-devops-action@latest
         id: msdo
         with:
-          tools: trivy 
-        
+          tools: trivy
 
   argoupdate:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-        argocd app create ${{ inputs.appname }} --repo ${{ inputs.repourl }}  --path  --dest-server https://kubernetes.default.svc --dest-namespace ${{}}
+      - name: argocd cli installation
+        run: |
+          VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
+          curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v$VERSION/argocd-linux-amd64
+          sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+          rm argocd-linux-amd64
 
+      - name: argo update
+        run: |
+          argocd app create ${{ inputs.appname }} --repo ${{ inputs.repourl }}  --path  --dest-server https://kubernetes.default.svc --dest-namespace

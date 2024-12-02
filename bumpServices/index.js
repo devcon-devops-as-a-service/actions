@@ -33388,8 +33388,19 @@ const getBumpFactor = () => {
     const prefix = commitMessage.split(':', 2)[0].trim().toLowerCase();
     return bumps[prefix] || 'minor';
 };
+const getChangedProjects = async () => {
+    const stack = (0, core_1.getInput)('stack');
+    const possibleComamnds = {
+        nx: 'npm ci; npx nx show projects  --with-target docker-build --json',
+        csharp: 'dotnet ...'
+    };
+    if (!possibleComamnds[stack]) {
+        (0, core_1.error)(`Cannot get changed projects: stack ${stack} is not supported`);
+    }
+    return (0, execAsync_1.execAsync)(possibleComamnds[stack]);
+};
 const main = async () => {
-    const inputProjectsText = (0, core_1.getInput)('projects');
+    const inputProjectsText = await getChangedProjects();
     if (!(inputProjectsText === null || inputProjectsText === void 0 ? void 0 : inputProjectsText.length)) {
         (0, core_1.error)('Cannot find input "inputProjects"');
         return;
@@ -33406,7 +33417,7 @@ const main = async () => {
             nextVersion
         };
     }));
-    (0, core_1.setOutput)('serviceToBuild', { include: serviceToBuild });
+    (0, core_1.setOutput)('servicesToBuild', { include: serviceToBuild });
 };
 main();
 

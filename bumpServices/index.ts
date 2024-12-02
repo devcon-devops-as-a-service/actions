@@ -22,8 +22,23 @@ const getBumpFactor = (): ReleaseType => {
     return bumps[prefix] || 'minor';
 };
 
+const getChangedProjects = async (): Promise<string> => {
+    const stack = getInput('stack');
+
+    const possibleComamnds: Record<string, string> = {
+        nx: 'npm ci; npx nx show projects  --with-target docker-build --json',
+        csharp: 'dotnet ...'
+    };
+
+    if (!possibleComamnds[stack]) {
+        error(`Cannot get changed projects: stack ${stack} is not supported`);
+    }
+
+    return execAsync(possibleComamnds[stack]);
+};
+
 const main = async () => {
-    const inputProjectsText = getInput('projects');
+    const inputProjectsText = await getChangedProjects();
 
     if (!inputProjectsText?.length) {
         error('Cannot find input "inputProjects"');
@@ -51,7 +66,7 @@ const main = async () => {
         })
     );
 
-    setOutput('serviceToBuild', { include: serviceToBuild });
+    setOutput('servicesToBuild', { include: serviceToBuild });
 };
 
 main();

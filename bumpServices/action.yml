@@ -3,9 +3,6 @@ description: ''
 author: 'Aharon Ohayon'
 
 inputs:
-    GITHUB_TOKEN:
-        description: 'GitHub token (in order to comment on PRs)'
-        required: true
     changedServices:
         descirption: 'An array of changed microservices'
         required: true
