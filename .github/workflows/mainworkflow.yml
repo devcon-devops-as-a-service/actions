@@ -33,10 +33,11 @@ jobs:
           stack: ${{ inputs.stack }}
 
   build-test-push:
+    name: Build ${{ matrix.project }}
     needs: preperation
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.preperation.outputs.services ) }}
+      matrix: ${{ fromJson(needs.preperation.outputs.services) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
