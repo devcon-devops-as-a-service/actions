@@ -100,6 +100,14 @@ jobs:
           sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
           rm argocd-linux-amd64
 
-      - name: argo update
+      - name: check if app exists and create app if needed
         run: |
-          argocd app create ${{ inputs.appName }} --repo ${{ inputs.repourl }}  --path  --dest-server https://kubernetes.default.svc --dest-namespace
+          argocd login 10.1.158.87 --username ${{ secrets.argouser }} --password ${{ secrets.argopassword }} 
+          argocd app get ${{ inputs.appName }} &> /dev/null
+          if [ $? -ne 0 ]; then
+            echo "Application $APP_NAME does not exist. Deploying new application..."
+            # Deploy the new application using application.yml
+            argocd app create -f .././argocd/newapp.yml
+          else
+            echo "Application $APP_NAME already exists."
+          fi
