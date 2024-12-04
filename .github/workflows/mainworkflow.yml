@@ -102,7 +102,7 @@ jobs:
 
       - name: check if app exists and create app if needed
         run: |
-          argocd login 10.1.158.87 --username ${{ secrets.argouser }} --password ${{ secrets.argopassword }} 
+          argocd login 10.1.158.87 --username ${{ secrets.argouser }} --password ${{ secrets.argopassword }} --skip-test-tls --insecure
           argocd app get ${{ inputs.appName }} &> /dev/null
           if [ $? -ne 0 ]; then
             echo "Application $APP_NAME does not exist. Deploying new application..."
