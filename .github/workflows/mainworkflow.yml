@@ -36,7 +36,7 @@ jobs:
 
       - name: Bump Services
         id: bumpServices
-        uses: ./.github/actions/bumpServices@main
+        uses: devcon-devops-as-a-service/actions/actions/bumpServices@main
         with:
           stack: ${{ inputs.stack }}
 
@@ -78,7 +78,7 @@ jobs:
           docker push acrdeccondemo.azurecr.io/${{ matrix.project}}:${{ matrix.nextVersion }}
 
       - name: Tag Service in git
-        uses: ./.github/actions/tagService@main
+        uses: devcon-devops-as-a-service/actions/actions/tagService@main
         with:
           service: ${{ matrix.project }}
           version: ${{ matrix.nextVersion }}
