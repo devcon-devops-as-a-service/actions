@@ -1,0 +1,15 @@
+name: 'Tag built Service'
+description: ''
+author: 'Aharon Ohayon'
+
+inputs:
+    service:
+        descirption: 'The name of the built'
+        required: true
+    version:
+        descirption: 'The version of the service'
+        required: true
+
+runs:
+    using: 'node20'
+    main: 'index.js'

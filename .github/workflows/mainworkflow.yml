@@ -2,6 +2,9 @@
 
 name: main workflow
 
+permissions:
+  contents: write
+
 # Controls when the workflow will run
 on:
   workflow_call:
@@ -9,13 +12,9 @@ on:
       stack:
         required: true
         type: string
-      securityscan:
+      securityScan:
         required: true
         type: boolean
-
-permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
 
 jobs:
   preperation:
@@ -25,12 +24,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 1
+
+      - name: Install Npm packages
+        if: ${{ inputs.stack == 'nx' }}
+        run: npm ci
 
       - name: Bump Services
         id: bumpServices
-        uses: ../bumpServices
+        uses: ./.github/actions/bumpServices
         with:
           stack: ${{ inputs.stack }}
+
+      - name: Echo Services output
+        run: echo ${{ steps.bumpServices.outputs.servicesToBuild }}
 
   build-test-push:
     name: Build ${{ matrix.project }}
@@ -41,27 +49,39 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 1
+
+      - name: Install Npm packages
+        if: ${{ inputs.stack == 'nx' }}
+        run: npm ci
 
       - name: Azure Login
-        uses: Azure/login@v2.2.0
+        uses: Azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: test
+      - name: Test Nx
+        if: ${{ inputs.stack == 'nx' }}
         run: |
-          test
+          npx nx test ${{ matrix.project }}
 
-      - name: build
+      - name: Build Docker Image
+        run: docker build -f apps/${{ matrix.project }}/Dockerfile . -t acrdeccondemo.azurecr.io/${{ matrix.project}}:${{ matrix.nextVersion }}
+
+      - name: Push Docker Image to ACR
         run: |
-          docker build
-          az acr login --name myContainerRegistry
+          az acr login -n acrdeccondemo
+          docker push acrdeccondemo.azurecr.io/${{ matrix.project}}:${{ matrix.nextVersion }}
 
-      - name: push
-        run: docker push
+      - name: Tag Service in git
+        uses: ./.github/actions/tagService
+        with:
+          service: ${{ matrix.project }}
+          version: ${{ matrix.nextVersion }}
 
       - name: Run Microsoft Security DevOps
+        if: ${{ inputs.securityScan }}
         uses: microsoft/security-devops-action@latest
         id: msdo
         with:

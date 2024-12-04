@@ -3,8 +3,8 @@ description: ''
 author: 'Aharon Ohayon'
 
 inputs:
-    changedServices:
-        descirption: 'An array of changed microservices'
+    stack:
+        descirption: 'The running stack of the caller repository. At the moment it can be nx or csharp'
         required: true
 
 runs:
