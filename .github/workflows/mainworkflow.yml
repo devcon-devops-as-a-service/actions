@@ -103,11 +103,4 @@ jobs:
       - name: check if app exists and create app if needed
         run: |
           argocd login 10.1.158.87 --username ${{ secrets.argouser }} --password ${{ secrets.argopassword }} --skip-test-tls --insecure
-          argocd app get ${{ inputs.appName }} &> /dev/null
-          if [ $? -ne 0 ]; then
-            echo "Application $APP_NAME does not exist. Deploying new application..."
-            # Deploy the new application using application.yml
-            argocd app create -f .././argocd/newapp.yml
-          else
-            echo "Application $APP_NAME already exists."
-          fi
+          argocd app create -f .././argocd/newapp.yml --upsert
