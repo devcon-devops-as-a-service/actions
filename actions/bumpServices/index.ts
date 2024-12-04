@@ -1,4 +1,4 @@
-import { error, getInput, setOutput } from '@actions/core';
+import { error, getInput, info, setOutput } from '@actions/core';
 import { inc, ReleaseType } from 'semver';
 import { context } from '@actions/github';
 import { execAsync } from '../utils';
@@ -61,6 +61,8 @@ const getChangedProjects = async (): Promise<ProjectProps[]> => {
 
 const main = async () => {
     const inputProjects = await getChangedProjects();
+
+    info('Inputs ' + JSON.stringify(inputProjects));
 
     if (!inputProjects?.length) {
         error('Cannot find input "inputProjects"');

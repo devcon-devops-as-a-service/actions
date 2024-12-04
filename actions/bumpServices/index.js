@@ -33438,6 +33438,7 @@ const getChangedProjects = async () => {
 };
 const main = async () => {
     const inputProjects = await getChangedProjects();
+    (0, core_1.info)('Inputs ' + JSON.stringify(inputProjects));
     if (!(inputProjects === null || inputProjects === void 0 ? void 0 : inputProjects.length)) {
         (0, core_1.error)('Cannot find input "inputProjects"');
         return;
