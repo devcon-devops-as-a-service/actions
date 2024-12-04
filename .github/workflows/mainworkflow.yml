@@ -9,6 +9,9 @@ permissions:
 on:
   workflow_call:
     inputs:
+      appName:
+        required: true
+        type: string
       stack:
         required: true
         type: string
@@ -67,7 +70,7 @@ jobs:
           npx nx test ${{ matrix.project }}
 
       - name: Build Docker Image
-        run: docker build -f apps/${{ matrix.project }}/Dockerfile . -t acrdeccondemo.azurecr.io/${{ matrix.project}}:${{ matrix.nextVersion }}
+        run: docker build -f ${{ matrix.dockerfilePath }} . -t acrdeccondemo.azurecr.io/${{ matrix.project}}:${{ matrix.nextVersion }}
 
       - name: Push Docker Image to ACR
         run: |
@@ -99,4 +102,4 @@ jobs:
 
       - name: argo update
         run: |
-          argocd app create ${{ inputs.appname }} --repo ${{ inputs.repourl }}  --path  --dest-server https://kubernetes.default.svc --dest-namespace
+          argocd app create ${{ inputs.appName }} --repo ${{ inputs.repourl }}  --path  --dest-server https://kubernetes.default.svc --dest-namespace

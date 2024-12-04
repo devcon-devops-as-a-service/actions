@@ -9,6 +9,11 @@ const bumps: Record<string, ReleaseType> = {
     breaking: 'major'
 };
 
+interface ProjectProps {
+    project: string;
+    dockerfilePath: string;
+}
+
 const getBumpFactor = (): ReleaseType => {
     const commitMessage = context.payload.head_commit?.message as string;
 
@@ -22,36 +27,51 @@ const getBumpFactor = (): ReleaseType => {
     return bumps[prefix] || 'minor';
 };
 
-const getChangedProjects = async (): Promise<string> => {
+const getChangedProjects = async (): Promise<ProjectProps[]> => {
     const stack = getInput('stack');
 
-    const possibleComamnds: Record<string, string> = {
-        nx: 'npx nx show projects  --with-target docker-build --json',
-        csharp: 'dotnet ...'
+    const possibleComamnds: Record<string, () => Promise<ProjectProps[]>> = {
+        nx: async () => {
+            const projects: string[] = JSON.parse(
+                await execAsync('npx nx show projects  --with-target docker-build --json')
+            );
+
+            return projects.map(project => ({
+                project,
+                dockerfilePath: `apps/${project}/Dockerfile`
+            }));
+        },
+
+        python: async () => {
+            const projectsText = await execAsync('find . -name "Dockerfile"');
+
+            return projectsText.split('\n').map(dockerfilePath => ({
+                project: dockerfilePath.substring(2, dockerfilePath.length - 11),
+                dockerfilePath
+            }));
+        }
     };
 
     if (!possibleComamnds[stack]) {
         error(`Cannot get changed projects: stack ${stack} is not supported`);
     }
 
-    return execAsync(possibleComamnds[stack]);
+    return await possibleComamnds[stack]();
 };
 
 const main = async () => {
-    const inputProjectsText = await getChangedProjects();
+    const inputProjects = await getChangedProjects();
 
-    if (!inputProjectsText?.length) {
+    if (!inputProjects?.length) {
         error('Cannot find input "inputProjects"');
 
         return;
     }
 
-    const inputProjects = JSON.parse(inputProjectsText) as string[];
-
     const bumpFactor = getBumpFactor();
 
     const serviceToBuild = await Promise.all(
-        inputProjects.map(async project => {
+        inputProjects.map(async ({ project, dockerfilePath }) => {
             const tags = await execAsync(`git tag -l --sort=-creatordate "${project}@*"`);
 
             const currentTag = tags.length ? tags.split('\n', 2)[0].substring(project.length + 1) : null;
@@ -60,6 +80,7 @@ const main = async () => {
 
             return {
                 project,
+                dockerfilePath,
                 currentVersion: currentTag,
                 nextVersion
             };
