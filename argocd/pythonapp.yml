@@ -13,7 +13,7 @@ spec:
     namespace: 'default'
     server: 'https://kubernetes.default.svc'
   source:
-    path: docker/k8s/chart
+    path: helm-chart
     repoURL: https://github.com/devcon-devops-as-a-service/openwebinars-helm-example.git
     targetRevision: master
   sources: []
