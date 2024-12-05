@@ -90,24 +90,17 @@ jobs:
         with:
           tools: trivy
 
-  argoupdate:
-    # needs: build-test-push
+  argocd-app-create:
+    needs: build-test-push
     runs-on: ubuntu-latest
     steps:
-      - name: ArgoCD CLI
+      - name: ArgoCD CLI installation
         uses: imajeetyadav/argocd-cli@v1
 
       - name: Checkout
         uses: actions/checkout@v4.2.2
-          
-      # - name: argocd cli installation
-      #   run: |
-      #     VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
-      #     curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v$VERSION/argocd-linux-amd64
-      #     sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
-      #     rm argocd-linux-amd64
 
-      - name: check if app exists and create app if needed
+      - name: argocd app create
         run: |
           argocd login 172.205.27.74 --username ${{ secrets.argouser }} --password ${{ secrets.argopassword }} --skip-test-tls --insecure
           argocd app create -f ./argocd/app.yml --upsert
