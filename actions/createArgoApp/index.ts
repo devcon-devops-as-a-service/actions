@@ -47,7 +47,7 @@ const main = async () => {
 
     console.log(servicesText);
 
-    const projects = JSON.parse(servicesText) as ProjectInfo[];
+    const projects = JSON.parse(servicesText).include as ProjectInfo[];
 
     const yamlText = createYamlText(
         appName,
