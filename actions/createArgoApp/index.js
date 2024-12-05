@@ -30813,9 +30813,9 @@ metadata:
   name: ${appName}
 spec:
   destination:
-    name: ''
-    namespace: 'default'
-    server: 'https://kubernetes.default.svc'
+    name: ""
+    namespace: ${appName}
+    server: https://kubernetes.default.svc
   source:
     path: docker/k8s/chart
     repoURL: https://github.com/${github_1.context.repo.owner}/${github_1.context.repo.repo}.git
