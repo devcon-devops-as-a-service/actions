@@ -91,6 +91,7 @@ jobs:
           tools: trivy
 
   argoupdate:
+    needs: build-test-push
     runs-on: ubuntu-latest
     steps:
       - name: ArgoCD CLI
