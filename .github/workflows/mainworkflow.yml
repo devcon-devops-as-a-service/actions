@@ -91,10 +91,14 @@ jobs:
           tools: trivy
 
   argoupdate:
+    # needs: build-test-push
     runs-on: ubuntu-latest
     steps:
       - name: ArgoCD CLI
         uses: imajeetyadav/argocd-cli@v1
+
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
           
       # - name: argocd cli installation
       #   run: |
@@ -106,4 +110,4 @@ jobs:
       - name: check if app exists and create app if needed
         run: |
           argocd login 172.205.27.74 --username ${{ secrets.argouser }} --password ${{ secrets.argopassword }} --skip-test-tls --insecure
-          argocd app create -f ./argocd/newapp.yml --upsert
+          argocd app create -f ./argocd/app.yml --upsert
