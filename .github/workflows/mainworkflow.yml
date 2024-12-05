@@ -106,6 +106,12 @@ jobs:
           appName: ${{ inputs.appName }}
           services: ${{ needs.preperation.outputs.services }}
 
+      - name: Check
+        run: |
+          cd argocd
+          ls 
+          cat app.yml
+
       - name: argocd app create
         run: |
           argocd login 172.205.27.74 --username ${{ secrets.argouser }} --password ${{ secrets.argopassword }} --skip-test-tls --insecure
