@@ -30799,6 +30799,7 @@ const github_1 = __nccwpck_require__(6557);
 const fs_1 = __nccwpck_require__(7147);
 const createYamlText = (appName, projects) => {
     const imagesList = projects
+        .sort()
         .map(p => `     argocd-image-updater.argoproj.io/image-list: acrdeccondemo.azurecr.io/${p}:^1.0.0`)
         .join('\n');
     const content = `apiVersion: argoproj.io/v1alpha1

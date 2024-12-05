@@ -5,6 +5,7 @@ import { ProjectInfo } from '../common';
 
 const createYamlText = (appName: string, projects: string[]) => {
     const imagesList = projects
+        .sort()
         .map(p => `     argocd-image-updater.argoproj.io/image-list: acrdeccondemo.azurecr.io/${p}:^1.0.0`)
         .join('\n');
 
