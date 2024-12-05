@@ -91,7 +91,7 @@ jobs:
           tools: trivy
 
   argoupdate:
-    needs: build-test-push
+    # needs: build-test-push
     runs-on: ubuntu-latest
     steps:
       - name: ArgoCD CLI
@@ -109,5 +109,6 @@ jobs:
 
       - name: check if app exists and create app if needed
         run: |
+          argocd app create -f ./argocd/app.yml
           argocd login 172.205.27.74 --username ${{ secrets.argouser }} --password ${{ secrets.argopassword }} --skip-test-tls --insecure
           argocd app create -f ./argocd/app.yml
