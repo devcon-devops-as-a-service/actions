@@ -95,6 +95,9 @@ jobs:
     steps:
       - name: ArgoCD CLI
         uses: imajeetyadav/argocd-cli@v1
+
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
           
       # - name: argocd cli installation
       #   run: |
