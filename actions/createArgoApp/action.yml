@@ -5,8 +5,8 @@ author: 'Aharon Ohayon'
 inputs:
     appName:
         description:
-    projects:
-        descirption: 'The name of all the projects (microservices)'
+    services:
+        descirption: 'The name of all the services to build'
         required: true
 
 runs:
