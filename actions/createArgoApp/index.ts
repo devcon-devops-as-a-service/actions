@@ -37,15 +37,15 @@ spec:
 };
 
 const main = async () => {
-    const projectsText = getInput('projects');
+    const servicesText = getInput('services');
 
-    if (!projectsText?.length) {
+    if (!servicesText?.length) {
         error('Projects input is null');
     }
 
     const appName = getInput('appName');
 
-    const projects = JSON.parse(projectsText) as ProjectInfo[];
+    const projects = JSON.parse(servicesText) as ProjectInfo[];
 
     const yamlText = createYamlText(
         appName,

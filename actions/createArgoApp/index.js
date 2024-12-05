@@ -30828,12 +30828,12 @@ spec:
     return content;
 };
 const main = async () => {
-    const projectsText = (0, core_1.getInput)('projects');
-    if (!(projectsText === null || projectsText === void 0 ? void 0 : projectsText.length)) {
+    const servicesText = (0, core_1.getInput)('services');
+    if (!(servicesText === null || servicesText === void 0 ? void 0 : servicesText.length)) {
         (0, core_1.error)('Projects input is null');
     }
     const appName = (0, core_1.getInput)('appName');
-    const projects = JSON.parse(projectsText);
+    const projects = JSON.parse(servicesText);
     const yamlText = createYamlText(appName, projects.map(p => p.project));
     (0, fs_1.writeFileSync)('./argocd/app.yaml', yamlText);
 };
