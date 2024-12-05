@@ -40,10 +40,12 @@ const main = async () => {
     const servicesText = getInput('services');
 
     if (!servicesText?.length) {
-        error('Projects input is null');
+        error('services input is null');
     }
 
     const appName = getInput('appName');
+
+    console.log(servicesText);
 
     const projects = JSON.parse(servicesText) as ProjectInfo[];
 

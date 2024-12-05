@@ -30830,9 +30830,10 @@ spec:
 const main = async () => {
     const servicesText = (0, core_1.getInput)('services');
     if (!(servicesText === null || servicesText === void 0 ? void 0 : servicesText.length)) {
-        (0, core_1.error)('Projects input is null');
+        (0, core_1.error)('services input is null');
     }
     const appName = (0, core_1.getInput)('appName');
+    console.log(servicesText);
     const projects = JSON.parse(servicesText);
     const yamlText = createYamlText(appName, projects.map(p => p.project));
     (0, fs_1.writeFileSync)('./argocd/app.yaml', yamlText);
