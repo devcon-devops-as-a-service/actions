@@ -24,7 +24,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     path: docker/k8s/chart
-    repoURL: https://github.com/${context.repo}.git
+    repoURL: https://github.com/${context.repo.owner}/${context.repo.repo}.git
     targetRevision: master
   sources: []
   project: default
@@ -44,8 +44,6 @@ const main = async () => {
     }
 
     const appName = getInput('appName');
-
-    console.log(context.repo);
 
     const projects = JSON.parse(servicesText).include as ProjectInfo[];
 
