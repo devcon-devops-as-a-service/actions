@@ -52,6 +52,8 @@ const main = async () => {
         projects.map(p => p.project)
     );
 
+    console.log(yamlText);
+
     writeFileSync('./argocd/app.yml', yamlText);
 };
 

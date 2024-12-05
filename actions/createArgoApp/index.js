@@ -30833,9 +30833,9 @@ const main = async () => {
         (0, core_1.error)('services input is null');
     }
     const appName = (0, core_1.getInput)('appName');
-    console.log(github_1.context.repo.owner);
     const projects = JSON.parse(servicesText).include;
     const yamlText = createYamlText(appName, projects.map(p => p.project));
+    console.log(yamlText);
     (0, fs_1.writeFileSync)('./argocd/app.yml', yamlText);
 };
 main();
