@@ -1,7 +1,7 @@
 import { error, getInput, info, setOutput } from '@actions/core';
 import { inc, ReleaseType } from 'semver';
 import { context } from '@actions/github';
-import { execAsync } from '../utils';
+import { execAsync, ProjectInfo } from '../common';
 
 const bumps: Record<string, ReleaseType> = {
     fix: 'patch',
@@ -85,7 +85,7 @@ const main = async () => {
                 dockerfilePath,
                 currentVersion: currentTag,
                 nextVersion
-            };
+            } as ProjectInfo;
         })
     );
 

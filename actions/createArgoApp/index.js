@@ -30834,7 +30834,7 @@ const main = async () => {
     }
     const appName = (0, core_1.getInput)('appName');
     const projects = JSON.parse(projectsText);
-    const yamlText = createYamlText(appName, projects);
+    const yamlText = createYamlText(appName, projects.map(p => p.project));
     (0, fs_1.writeFileSync)('./argocd/app.yaml', yamlText);
 };
 main();

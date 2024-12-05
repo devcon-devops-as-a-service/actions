@@ -31455,7 +31455,7 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 8177:
+/***/ 8673:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -31473,7 +31473,7 @@ exports.execAsync = execAsync;
 
 /***/ }),
 
-/***/ 8565:
+/***/ 1796:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -31493,7 +31493,18 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(8177), exports);
+__exportStar(__nccwpck_require__(8673), exports);
+__exportStar(__nccwpck_require__(4789), exports);
+
+
+/***/ }),
+
+/***/ 4789:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
@@ -33397,7 +33408,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(6150);
 const semver_1 = __nccwpck_require__(8317);
 const github_1 = __nccwpck_require__(6557);
-const utils_1 = __nccwpck_require__(8565);
+const common_1 = __nccwpck_require__(1796);
 const bumps = {
     fix: 'patch',
     feat: 'minor',
@@ -33417,14 +33428,14 @@ const getChangedProjects = async () => {
     const stack = (0, core_1.getInput)('stack');
     const possibleComamnds = {
         nx: async () => {
-            const projects = JSON.parse(await (0, utils_1.execAsync)('npx nx show projects  --with-target docker-build --json'));
+            const projects = JSON.parse(await (0, common_1.execAsync)('npx nx show projects  --with-target docker-build --json'));
             return projects.map(project => ({
                 project,
                 dockerfilePath: `apps/${project}/Dockerfile`
             }));
         },
         python: async () => {
-            const projectsText = await (0, utils_1.execAsync)('find . -name "Dockerfile"');
+            const projectsText = await (0, common_1.execAsync)('find . -name "Dockerfile"');
             return projectsText.split('\n').map(dockerfilePath => ({
                 project: dockerfilePath.substring(2, dockerfilePath.length - 11),
                 dockerfilePath
@@ -33445,7 +33456,7 @@ const main = async () => {
     }
     const bumpFactor = getBumpFactor();
     const serviceToBuild = await Promise.all(inputProjects.map(async ({ project, dockerfilePath }) => {
-        const tags = await (0, utils_1.execAsync)(`git tag -l --sort=-creatordate "${project}@*"`);
+        const tags = await (0, common_1.execAsync)(`git tag -l --sort=-creatordate "${project}@*"`);
         const currentTag = tags.length ? tags.split('\n', 2)[0].substring(project.length + 1) : null;
         const nextVersion = currentTag ? (0, semver_1.inc)(currentTag, bumpFactor) : '1.0.0';
         return {

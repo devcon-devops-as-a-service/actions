@@ -24702,7 +24702,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 8177:
+/***/ 8673:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -24720,7 +24720,7 @@ exports.execAsync = execAsync;
 
 /***/ }),
 
-/***/ 8565:
+/***/ 1796:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -24740,7 +24740,18 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(8177), exports);
+__exportStar(__nccwpck_require__(8673), exports);
+__exportStar(__nccwpck_require__(4789), exports);
+
+
+/***/ }),
+
+/***/ 4789:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
@@ -26642,7 +26653,7 @@ var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(6150);
-const utils_1 = __nccwpck_require__(8565);
+const common_1 = __nccwpck_require__(1796);
 const main = async () => {
     const service = (0, core_1.getInput)('service');
     if (!(service === null || service === void 0 ? void 0 : service.length)) {
@@ -26654,8 +26665,8 @@ const main = async () => {
         (0, core_1.error)('Cannot find input "version"');
         return;
     }
-    await (0, utils_1.execAsync)(`git tag ${service}@${version}`);
-    await (0, utils_1.execAsync)(`git push origin tag ${service}@${version}`);
+    await (0, common_1.execAsync)(`git tag ${service}@${version}`);
+    await (0, common_1.execAsync)(`git push origin tag ${service}@${version}`);
     (0, core_1.info)(`Service ${service} was tagged successfully`);
 };
 main();

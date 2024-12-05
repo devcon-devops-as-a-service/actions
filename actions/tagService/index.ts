@@ -1,5 +1,5 @@
 import { error, getInput, info } from '@actions/core';
-import { execAsync } from '../utils';
+import { execAsync } from '../common';
 
 const main = async () => {
     const service = getInput('service');

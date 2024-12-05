@@ -1,6 +1,7 @@
 import { error, getInput } from '@actions/core';
 import { context } from '@actions/github';
 import { writeFileSync } from 'fs';
+import { ProjectInfo } from '../common';
 
 const createYamlText = (appName: string, projects: string[]) => {
     const imagesList = projects
@@ -44,9 +45,12 @@ const main = async () => {
 
     const appName = getInput('appName');
 
-    const projects = JSON.parse(projectsText) as string[];
+    const projects = JSON.parse(projectsText) as ProjectInfo[];
 
-    const yamlText = createYamlText(appName, projects);
+    const yamlText = createYamlText(
+        appName,
+        projects.map(p => p.project)
+    );
 
     writeFileSync('./argocd/app.yaml', yamlText);
 };

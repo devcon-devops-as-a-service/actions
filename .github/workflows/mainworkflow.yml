@@ -91,7 +91,7 @@ jobs:
           tools: trivy
 
   argoupdate:
-    # needs: build-test-push
+    needs: preperation
     runs-on: ubuntu-latest
     steps:
       - name: ArgoCD CLI
@@ -99,7 +99,13 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4.2.2
-          
+
+      - name: Create Argo App file
+        uses: devcon-devops-as-a-service/actions/actions/createArgoApp@main
+        with:
+          appName: ${{ inputs.appName }}
+          projects: ${{ needs.preperation.outputs.services }}
+
       # - name: argocd cli installation
       #   run: |
       #     VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
