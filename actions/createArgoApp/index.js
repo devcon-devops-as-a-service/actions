@@ -30800,13 +30800,13 @@ const fs_1 = __nccwpck_require__(7147);
 const createYamlText = (appName, projects) => {
     const imagesList = projects
         .sort()
-        .map(p => `     argocd-image-updater.argoproj.io/image-list: acrdeccondemo.azurecr.io/${p}:^1.0.0`)
-        .join('\n');
+        .map(p => `acrdeccondemo.azurecr.io/${p}:^1.0.0`)
+        .join(',');
     const content = `apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-${imagesList}
+     argocd-image-updater.argoproj.io/image-list: ${imagesList}
      argocd-image-updater.argoproj.io/write-back-method: argocd
      argocd-image-updater.argoproj.io/reduced.force-update: "true"
      
