@@ -1,0 +1,14 @@
+name: 'Create Argo App'
+description: ''
+author: 'Aharon Ohayon'
+
+inputs:
+    appName:
+        description:
+    projects:
+        descirption: 'The name of all the projects (microservices)'
+        required: true
+
+runs:
+    using: 'node20'
+    main: 'index.js'
