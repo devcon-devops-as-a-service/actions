@@ -106,4 +106,4 @@ jobs:
       - name: check if app exists and create app if needed
         run: |
           argocd login 172.205.27.74 --username ${{ secrets.argouser }} --password ${{ secrets.argopassword }} --skip-test-tls --insecure
-          argocd app create -f ./argocd/newapp.yml --upsert
+          argocd app create -f argocd/app.yml --upsert
