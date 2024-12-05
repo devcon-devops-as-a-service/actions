@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+     argocd-image-updater.argoproj.io/image-list: acrdeccondemo.azurecr.io/samplepython:^1.0.0
+     argocd-image-updater.argoproj.io/write-back-method: argocd
+     argocd-image-updater.argoproj.io/reduced.force-update: "true"
+     
+  name: samplepython
+spec:
+  destination:
+    name: ''
+    namespace: 'default'
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: docker/k8s/chart
+    repoURL: https://github.com/devcon-devops-as-a-service/openwebinars-helm-example.git
+    targetRevision: master
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
